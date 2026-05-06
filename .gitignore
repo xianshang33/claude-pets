@@ -1,0 +1,35 @@
+.DS_Store
+*.log
+*.tar.gz
+
+# Local brainstorming / visual companion artifacts
+.superpowers/
+.omc/
+.omx/
+artifacts/
+claude-pet-offline-sync-*/
+docs/assets/hero-options/
+docs/superpowers/
+tests/
+
+# Test outputs
+test-results/
+playwright-report/
+blob-report/
+
+# Git worktrees created by implementation workflows
+.worktrees/
+worktrees/
+
+# Node / Electron build outputs
+node_modules/
+dist/
+dist-electron/
+dist-renderer/
+build/
+out/
+release/
+coverage/
+
+# Local extracted Codex built-in pet assets. Do not bundle these.
+*-spritesheet-v4-*.webp

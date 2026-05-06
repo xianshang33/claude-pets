@@ -86,4 +86,4 @@ Claude Pets is early and macOS-only.
 
 ## License
 
-License pending.
+MIT

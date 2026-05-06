@@ -86,4 +86,4 @@ Claude Pets 还在早期阶段，目前只支持 macOS。
 
 ## License
 
-License pending.
+MIT

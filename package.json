@@ -6,7 +6,7 @@
   "main": "dist-electron/main.cjs",
   "scripts": {
     "setup": "tsx scripts/setup.ts",
-    "start": "npm run dev",
+    "start": "npm run build && electron .",
     "dev": "tsx scripts/dev.ts",
     "build": "npm run typecheck && vite build && tsx scripts/build-electron.ts",
     "typecheck": "tsc --noEmit",

@@ -2,6 +2,7 @@
   "name": "claude-pet",
   "version": "0.1.0",
   "private": true,
+  "productName": "Claude Pets",
   "description": "macOS Electron desktop pet for Claude Code.",
   "main": "dist-electron/main.cjs",
   "scripts": {
@@ -9,6 +10,7 @@
     "start": "npm run build && electron .",
     "dev": "tsx scripts/dev.ts",
     "build": "npm run typecheck && vite build && tsx scripts/build-electron.ts",
+    "package:dmg": "npm run build && tsx scripts/package-dmg.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:e2e": "vitest run --config vitest.config.ts tests/e2e/electronApp.e2e.test.ts",
@@ -22,6 +24,7 @@
     "@types/wait-on": "^5.3.4",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^38.8.6",
+    "electron-builder": "^26.8.1",
     "esbuild": "0.25.11",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -30,5 +33,44 @@
     "vite": "^5.4.21",
     "vitest": "2.1.9",
     "wait-on": "8.0.4"
+  },
+  "build": {
+    "appId": "dev.claudepets.app",
+    "productName": "Claude Pets",
+    "asar": true,
+    "npmRebuild": false,
+    "electronDist": "node_modules/electron/dist",
+    "files": [
+      "dist-electron/**/*",
+      "dist-renderer/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "hooks",
+        "to": "hooks",
+        "filter": [
+          "claude-pet-hook.js"
+        ]
+      },
+      {
+        "from": "pets",
+        "to": "pets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.developer-tools",
+      "icon": "build/icon.icns",
+      "identity": null
+    },
+    "dmg": {
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
   }
 }

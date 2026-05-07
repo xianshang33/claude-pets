@@ -38,7 +38,13 @@
 
 ## 快速开始
 
-需要 macOS、Claude Code，以及 Node.js 22 或更新版本。
+需要 macOS 和 Claude Code。
+
+安装 `.dmg`，把 Claude Pets 拖到 Applications，然后启动 App。
+首次启动时，Claude Pets 会自动安装 Claude Code hooks 和内置默认宠物。
+已有的 Claude Pets hook 不会重复添加，`~/.claude/pets` 里已经存在的宠物目录会跳过，不会被覆盖。
+
+如果你从源码运行，还需要 Node.js 22 或更新版本：
 
 ```bash
 npm install
@@ -74,8 +80,8 @@ cp -R /path/to/<pet-id> ~/.claude/pets/
 
 Claude Pets 还在早期阶段，目前只支持 macOS。
 
-- 现在主要通过源码运行。
-- 不内置、不复制、不同步 Codex 宠物资源。
+- 提供适合本地使用的 macOS `.dmg`；源码用户仍然可以运行 `npm run setup`。
+- 内置 Claude Pets 默认宠物，但不复制、不同步 Codex 宠物资源。
 - 非官方项目，与 Anthropic、OpenAI、Claude Code 或 Codex 无关联。
 
 ## 文档

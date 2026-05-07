@@ -26,7 +26,10 @@ node_modules/
 dist/
 dist-electron/
 dist-renderer/
-build/
+build/*
+!build/icon-source.png
+!build/icon.png
+!build/icon.icns
 out/
 release/
 coverage/

@@ -25,6 +25,13 @@ export type SetupResult = {
   skippedPets: string[];
 };
 
+export type RunSetupOptions = {
+  repositoryRoot?: string;
+  claudeDirectory?: string;
+  hookCommand?: string;
+  skipNodeVersionCheck?: boolean;
+};
+
 export function createHookCommand(repositoryRoot: string): string {
   return `node ${JSON.stringify(path.join(repositoryRoot, "hooks", "claude-pet-hook.js"))}`;
 }
@@ -44,8 +51,14 @@ export function installClaudePetHooks(settings: unknown, hookCommand: string): {
       changed = true;
     }
 
-    if (!currentEntries.some((entry) => containsHookCommand(entry, hookCommand))) {
-      currentEntries.push({
+    const { entries, found } = updateExistingClaudePetHookCommands(currentEntries, hookCommand);
+    const nextEntries = [...entries];
+    if (entries !== currentEntries) {
+      changed = true;
+    }
+
+    if (!found) {
+      nextEntries.push({
         matcher: "",
         hooks: [
           {
@@ -57,16 +70,16 @@ export function installClaudePetHooks(settings: unknown, hookCommand: string): {
       changed = true;
     }
 
-    hooks[eventName] = currentEntries;
+    hooks[eventName] = nextEntries;
   }
 
   next.hooks = hooks;
   return { settings: next, changed };
 }
 
-export async function runSetup(options: { repositoryRoot?: string; claudeDirectory?: string } = {}): Promise<SetupResult> {
+export async function runSetup(options: RunSetupOptions = {}): Promise<SetupResult> {
   const nodeMajor = Number.parseInt(process.versions.node.split(".")[0] ?? "0", 10);
-  if (!isSupportedNodeMajor(nodeMajor) && process.env.CLAUDE_PET_SETUP_ALLOW_NON_NODE22 !== "1") {
+  if (!options.skipNodeVersionCheck && !isSupportedNodeMajor(nodeMajor) && process.env.CLAUDE_PET_SETUP_ALLOW_NON_NODE22 !== "1") {
     throw new Error(`Claude Pets source setup requires Node 22 or newer. Current Node is ${process.versions.node}. Run: nvm use 22`);
   }
 
@@ -74,7 +87,7 @@ export async function runSetup(options: { repositoryRoot?: string; claudeDirecto
   const claudeDirectory = options.claudeDirectory ?? path.join(os.homedir(), ".claude");
   const settingsPath = path.join(claudeDirectory, "settings.json");
   const petsDirectory = path.join(claudeDirectory, "pets");
-  const hookCommand = createHookCommand(repositoryRoot);
+  const hookCommand = options.hookCommand ?? createHookCommand(repositoryRoot);
 
   await mkdir(claudeDirectory, { recursive: true });
   await mkdir(petsDirectory, { recursive: true });
@@ -180,6 +193,55 @@ function containsHookCommand(entry: unknown, hookCommand: string): boolean {
     }
     return normalizeCommand(hook.command) === normalizeCommand(hookCommand);
   });
+}
+
+function updateExistingClaudePetHookCommands(entries: unknown[], hookCommand: string): { entries: unknown[]; found: boolean } {
+  let found = false;
+  let changed = false;
+  const nextEntries = entries.map((entry) => {
+    if (!isRecord(entry) || !Array.isArray(entry.hooks)) {
+      return entry;
+    }
+
+    const nextHooks = entry.hooks.map((hook) => {
+      if (!isRecord(hook) || hook.type !== "command" || typeof hook.command !== "string") {
+        return hook;
+      }
+
+      if (normalizeCommand(hook.command) === normalizeCommand(hookCommand)) {
+        found = true;
+        return hook;
+      }
+
+      if (!isClaudePetHookCommand(hook.command)) {
+        return hook;
+      }
+
+      found = true;
+      changed = true;
+      return {
+        ...hook,
+        command: hookCommand
+      };
+    });
+
+    return nextHooks === entry.hooks
+      ? entry
+      : {
+          ...entry,
+          hooks: nextHooks
+        };
+  });
+
+  return {
+    entries: changed ? nextEntries : entries,
+    found
+  };
+}
+
+function isClaudePetHookCommand(command: string): boolean {
+  const normalized = normalizeCommand(command);
+  return normalized.includes("hooks/claude-pet-hook.js") || normalized.includes(` ${"--claude-hook"}`);
 }
 
 function normalizeCommand(command: string): string {

@@ -20,6 +20,21 @@ export type PetPackageWarning = {
   message: string;
 };
 
+export type AppSetupStatus =
+  | {
+      status: "skipped";
+    }
+  | {
+      status: "completed";
+      changed: boolean;
+      installedPets: string[];
+      skippedPets: string[];
+    }
+  | {
+      status: "failed";
+      message: string;
+    };
+
 export type ClaudeHookEventName =
   | "UserPromptSubmit"
   | "PreToolUse"
@@ -139,6 +154,7 @@ export type InitialState = {
   selectedPet: PetPackage | null;
   warnings: PetPackageWarning[];
   bridge: ClaudeBridgeStatus;
+  setup?: AppSetupStatus;
 };
 
 export type ClaudePetOverlayBounds = {

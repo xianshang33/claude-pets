@@ -5,6 +5,8 @@ import type { ClaudeBridgeStatus, InitialState } from "./types";
 import { scanPetPackages } from "./petPackageLoader";
 import { getDefaultAppDataDirectory, loadSelectedPetId, saveSelectedPetId } from "./petSelectionStore";
 
+const defaultBundledPetId = "mianmian";
+
 export type CreateInitialStateOptions = {
   homeDir?: string;
   appDataDir?: string;
@@ -23,7 +25,8 @@ export async function createInitialState(options: CreateInitialStateOptions = {}
 
   const { pets, warnings } = await scanPetPackages(petsDirectory);
   const selectedPetId = await loadSelectedPetId(appDataDir);
-  const selectedPet = pets.find((pet) => pet.id === selectedPetId) ?? pets[0] ?? null;
+  const selectedPet =
+    pets.find((pet) => pet.id === selectedPetId) ?? pets.find((pet) => pet.id === defaultBundledPetId) ?? pets[0] ?? null;
 
   if (selectedPet && selectedPet.id !== selectedPetId) {
     await saveSelectedPetId(appDataDir, selectedPet.id);

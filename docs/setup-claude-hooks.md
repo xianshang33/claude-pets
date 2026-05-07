@@ -1,6 +1,11 @@
 # Claude Hooks Setup
 
-Claude Pets listens on `http://127.0.0.1:38987` by default. For source checkouts, prefer the automatic setup command:
+Claude Pets listens on `http://127.0.0.1:38987` by default.
+
+For the packaged app, install the `.dmg`, drag Claude Pets into Applications, and launch it once.
+First launch installs the hook command that points back to the packaged app, installs bundled pets into `~/.claude/pets`, skips pets that already exist, and does not duplicate existing Claude Pets hooks.
+
+For source checkouts, prefer the automatic setup command:
 
 ```bash
 nvm use 22
@@ -9,7 +14,7 @@ npm run setup
 npm start
 ```
 
-`npm run setup` creates `~/.claude/pets` and merges the hook below into `~/.claude/settings.json` without removing unrelated settings or hook commands.
+`npm run setup` creates `~/.claude/pets`, installs bundled pets that are not already present, and merges the hook below into `~/.claude/settings.json` without removing unrelated settings or hook commands.
 
 Use the manual JSON below only when you want to audit or install the hook yourself.
 

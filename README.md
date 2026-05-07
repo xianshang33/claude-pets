@@ -38,7 +38,13 @@
 
 ## Quick Start
 
-Requires macOS, Claude Code, and Node.js 22 or newer.
+Requires macOS and Claude Code.
+
+Install the `.dmg`, drag Claude Pets into Applications, then launch the app.
+On first launch, Claude Pets automatically installs its Claude Code hooks and bundled starter pets.
+Existing Claude Pets hooks are not duplicated, and existing pet folders in `~/.claude/pets` are skipped instead of overwritten.
+
+Source checkouts also require Node.js 22 or newer:
 
 ```bash
 npm install
@@ -74,8 +80,8 @@ Looking for pets? Try the community pet market at [codex-pets.net](https://codex
 
 Claude Pets is early and macOS-only.
 
-- Source install only for now.
-- Does not bundle, copy, or sync Codex assets.
+- Ships as a local-friendly macOS `.dmg`; source users can still run `npm run setup`.
+- Bundles starter Claude Pets, but does not copy or sync Codex assets.
 - Unofficial project, not affiliated with Anthropic, OpenAI, Claude Code, or Codex.
 
 ## Docs

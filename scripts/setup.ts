@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -21,6 +21,8 @@ export type SetupResult = {
   changed: boolean;
   configuredEvents: string[];
   nodeMajor: number;
+  installedPets: string[];
+  skippedPets: string[];
 };
 
 export function createHookCommand(repositoryRoot: string): string {
@@ -76,6 +78,7 @@ export async function runSetup(options: { repositoryRoot?: string; claudeDirecto
 
   await mkdir(claudeDirectory, { recursive: true });
   await mkdir(petsDirectory, { recursive: true });
+  const { installedPets, skippedPets } = await installBundledPets(repositoryRoot, petsDirectory);
 
   const existingSettings = await readSettings(settingsPath);
   const { settings, changed } = installClaudePetHooks(existingSettings, hookCommand);
@@ -90,8 +93,54 @@ export async function runSetup(options: { repositoryRoot?: string; claudeDirecto
     hookCommand,
     changed,
     configuredEvents: [...claudePetHookEvents],
-    nodeMajor
+    nodeMajor,
+    installedPets,
+    skippedPets
   };
+}
+
+export async function installBundledPets(repositoryRoot: string, petsDirectory: string): Promise<{ installedPets: string[]; skippedPets: string[] }> {
+  const bundledPetsDirectory = path.join(repositoryRoot, "pets");
+  const installedPets: string[] = [];
+  const skippedPets: string[] = [];
+
+  let entries: Array<{ name: string; isDirectory(): boolean }>;
+  try {
+    entries = await readdir(bundledPetsDirectory, { withFileTypes: true });
+  } catch (error) {
+    if (isNodeError(error) && error.code === "ENOENT") {
+      return { installedPets, skippedPets };
+    }
+    throw error;
+  }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name.startsWith(".")) {
+      continue;
+    }
+
+    const sourceDirectory = path.join(bundledPetsDirectory, entry.name);
+    const targetDirectory = path.join(petsDirectory, entry.name);
+
+    if (!(await fileExists(path.join(sourceDirectory, "pet.json")))) {
+      continue;
+    }
+
+    if (await fileExists(targetDirectory)) {
+      skippedPets.push(entry.name);
+      continue;
+    }
+
+    await cp(sourceDirectory, targetDirectory, {
+      recursive: true,
+      force: false,
+      errorOnExist: true,
+      filter: (source) => path.basename(source) !== ".DS_Store"
+    });
+    installedPets.push(entry.name);
+  }
+
+  return { installedPets, skippedPets };
 }
 
 async function readSettings(settingsPath: string): Promise<unknown> {
@@ -103,6 +152,18 @@ async function readSettings(settingsPath: string): Promise<unknown> {
     }
     if (error instanceof SyntaxError) {
       throw new Error(`Could not parse ${settingsPath}. Fix the JSON syntax and rerun setup.`);
+    }
+    throw error;
+  }
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await stat(filePath);
+    return true;
+  } catch (error) {
+    if (isNodeError(error) && error.code === "ENOENT") {
+      return false;
     }
     throw error;
   }
@@ -139,6 +200,12 @@ async function main(): Promise<void> {
   console.log(`Claude Pets setup ${status}.`);
   console.log(`Settings: ${result.settingsPath}`);
   console.log(`Pet directory: ${result.petsDirectory}`);
+  if (result.installedPets.length > 0) {
+    console.log(`Installed bundled pets: ${result.installedPets.join(", ")}`);
+  }
+  if (result.skippedPets.length > 0) {
+    console.log(`Already installed pets: ${result.skippedPets.join(", ")}`);
+  }
   console.log(`Hook command: ${result.hookCommand}`);
   console.log(`Events: ${result.configuredEvents.join(", ")}`);
   console.log("Start with: npm start");

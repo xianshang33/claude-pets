@@ -46,7 +46,7 @@ npm run setup
 npm start
 ```
 
-`npm run setup` 会创建 `~/.claude/pets`，并把 Claude Code hook 命令写入 `~/.claude/settings.json`。
+`npm run setup` 会创建 `~/.claude/pets`，安装项目内置的默认宠物，并把 Claude Code hook 命令写入 `~/.claude/settings.json`。
 它会保留你已有的 Claude 设置。
 
 ## 添加宠物

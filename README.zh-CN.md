@@ -34,7 +34,6 @@
 - 支持在气泡里处理权限请求：`Allow` / `Deny`。
 - 从 `~/.claude/pets` 加载 Codex-compatible 宠物包。
 - Codex Pet 可以直接用于 Claude Pets：把宠物包复制到 pets 目录即可。
-- 只在本机工作：bridge 监听 `127.0.0.1`。
 
 ## 快速开始
 

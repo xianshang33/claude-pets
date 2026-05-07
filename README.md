@@ -34,7 +34,6 @@
 - Supports `Allow` / `Deny` for permission requests.
 - Loads Codex-compatible pet packages from `~/.claude/pets`.
 - Use Codex pets directly: copy a pet package into Claude Pets' pets directory.
-- Stays local: the bridge listens on `127.0.0.1`.
 
 ## Quick Start
 

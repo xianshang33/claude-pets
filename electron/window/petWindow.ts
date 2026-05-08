@@ -491,7 +491,8 @@ export function applyOverlayContentBounds(window: BrowserWindow, contentBounds: 
     return;
   }
 
-  const clampedBounds = clampBoundsToVisibleDisplay(targetBounds, dragAnchorBounds ?? toRectangle(contentBounds));
+  const visibleRect = getVisibleRectInTargetBounds(currentBounds, targetBounds, dragAnchorBounds ?? toRectangle(contentBounds));
+  const clampedBounds = clampBoundsToVisibleDisplay(targetBounds, visibleRect);
   if (!rectanglesEqual(currentBounds, clampedBounds)) {
     window.setContentBounds(clampedBounds, false);
   }
@@ -567,6 +568,15 @@ function clampBoundsToVisibleDisplay(bounds: Rectangle, visibleRect: Rectangle =
 
 function rectanglesEqual(left: Rectangle, right: Rectangle): boolean {
   return left.x === right.x && left.y === right.y && left.width === right.width && left.height === right.height;
+}
+
+function getVisibleRectInTargetBounds(currentBounds: Rectangle, targetBounds: Rectangle, visibleRect: Rectangle): Rectangle {
+  return {
+    x: currentBounds.x + visibleRect.x - targetBounds.x,
+    y: currentBounds.y + visibleRect.y - targetBounds.y,
+    width: visibleRect.width,
+    height: visibleRect.height
+  };
 }
 
 function normalizeFiniteNumber(value: unknown): number | null {

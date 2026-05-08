@@ -76,4 +76,4 @@ If `npm version` already created the tag, skip `git tag v<version>` and just pus
 - `electronDist` points at `node_modules/electron/dist` so packaging reuses the locally installed Electron runtime instead of downloading it again.
 - `hooks/` and `pets/` are packaged as `extraResources`, so first-launch setup copies from real directories under `Claude Pets.app/Contents/Resources`.
 - The hook command uses `ELECTRON_RUN_AS_NODE=1`, so installed users do not need Node.js on their `PATH`.
-- The local DMG is unsigned and not notarized. Public releases should eventually add Developer ID signing and notarization.
+- The local DMG is ad-hoc signed for bundle consistency but not notarized. Public releases should eventually add Developer ID signing and notarization.

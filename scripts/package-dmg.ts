@@ -35,7 +35,7 @@ async function main(): Promise<void> {
   await rm(checksumPath, { force: true });
   await rm(releaseGuidePath, { force: true });
   await mkdir(dmgRoot, { recursive: true });
-  await cp(appPath, path.join(dmgRoot, `${productName}.app`), { recursive: true });
+  await cp(appPath, path.join(dmgRoot, `${productName}.app`), { recursive: true, verbatimSymlinks: true });
   await symlink("/Applications", path.join(dmgRoot, "Applications"));
   await run("hdiutil", ["create", "-volname", productName, "-srcfolder", dmgRoot, "-ov", "-format", "UDZO", dmgPath]);
   const checksum = await sha256File(dmgPath);

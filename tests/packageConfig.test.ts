@@ -30,7 +30,7 @@ describe("package config", () => {
     expect(packageJson.build?.electronDist).toBe("node_modules/electron/dist");
     expect(packageJson.build?.mac?.target).toContain("dmg");
     expect(packageJson.build?.mac?.icon).toBe("build/icon.icns");
-    expect(packageJson.build?.mac?.identity).toBeNull();
+    expect(packageJson.build?.mac?.identity).toBe("-");
     expect(packageJson.build?.files).toEqual(
       expect.arrayContaining([
         "dist-electron/**/*",
@@ -44,5 +44,11 @@ describe("package config", () => {
         { from: "pets", to: "pets", filter: ["**/*"] }
       ])
     );
+  });
+
+  it("preserves Electron framework symlinks when staging the dmg app", async () => {
+    const packageDmgScript = await readFile(path.join(process.cwd(), "scripts", "package-dmg.ts"), "utf8");
+
+    expect(packageDmgScript).toContain("verbatimSymlinks: true");
   });
 });
